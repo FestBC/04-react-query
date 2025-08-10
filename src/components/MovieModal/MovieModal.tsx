@@ -6,13 +6,11 @@ import css from "./MovieModal.module.css";
 import { type Movie } from "../../types/movie";
 
 interface MovieModalProps {
-    movie: Movie,
+    movie: Movie | null,
     onClose: () => void
 }
 
 export default function MovieModal({ movie, onClose }: MovieModalProps) {
-    const { backdrop_path, title, overview, release_date, vote_average } = movie;
-
     useEffect(() => {
         const handleKeyDown = (event: KeyboardEvent): void => {
             if (event.code === "Escape") {
@@ -41,18 +39,18 @@ export default function MovieModal({ movie, onClose }: MovieModalProps) {
                 <button className={css.closeButton} aria-label="Close modal" onClick={onClose}>
                     &times;
                 </button>
-                <img src={`https://image.tmdb.org/t/p/original${backdrop_path}`}
-                     alt={title}
+                <img src={`https://image.tmdb.org/t/p/original${movie?.backdrop_path}`}
+                     alt={movie?.title}
                      className={css.image}
                 />
                 <div className={css.content}>
-                    <h2>{title}</h2>
-                    <p>{overview}</p>
+                    <h2>{movie?.title}</h2>
+                    <p>{movie?.overview}</p>
                     <p>
-                        <strong>Release Date:</strong> {release_date}
+                        <strong>Release Date:</strong> {movie?.release_date}
                     </p>
                     <p>
-                        <strong>Rating:</strong> {vote_average}/10
+                        <strong>Rating:</strong> {movie?.vote_average}/10
                     </p>
                 </div>
             </div>

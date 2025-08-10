@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 import css from "./App.module.css";
 
@@ -19,15 +19,7 @@ export default function App() {
   const [query, setQuery] = useState("");
   const [page, setPage] = useState(1);
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [clickedMovie, setClickedMovie] = useState<Movie>( {
-    id: 0,
-    poster_path: "",
-    backdrop_path: "",
-    title: "",
-    overview: "",
-    release_date: "",
-    vote_average: 0
-  });
+  const [clickedMovie, setClickedMovie] = useState<Movie | null>(null);
   
   const { data, isLoading, isError } = useQuery({
     queryKey: ["movies", query, page],
@@ -36,9 +28,11 @@ export default function App() {
     placeholderData: keepPreviousData
   });
 
-  if (data?.results.length === 0) {
+  useEffect(() => {
+    if (data?.results.length === 0) {
       toast.error("No movies found for your request.");
-  }
+    }
+  }, [data]);
 
   const movies: Movie[] = data?.results ?? [];
   const totalPages: number = data?.total_pages ?? 0;
@@ -55,15 +49,7 @@ export default function App() {
 
   const handleClose = (): void => {
     setIsModalOpen(false);
-    setClickedMovie( {
-      id: 0,
-      poster_path: "",
-      backdrop_path: "",
-      title: "",
-      overview: "",
-      release_date: "",
-      vote_average: 0
-    } );
+    setClickedMovie(null);
   }
 
   return (

@@ -27,7 +27,8 @@ export default function App() {
     overview: "",
     release_date: "",
     vote_average: 0
-  } );
+  });
+  
   const { data, isLoading, isError } = useQuery({
     queryKey: ["movies", query, page],
     queryFn: () => fetchTmdb(query, page),
@@ -35,13 +36,16 @@ export default function App() {
     placeholderData: keepPreviousData
   });
 
+  if (data?.results.length === 0) {
+      toast.error("No movies found for your request.");
+  }
+
+  const movies: Movie[] = data?.results ?? [];
+  const totalPages: number = data?.total_pages ?? 0;
+
   const handleSubmit = (query: string): void => {
     setQuery(query);
     setPage(1);
-  }
-
-  if (data?.results.length === 0) {
-      toast.error("No movies found for your request.");
   }
 
   const handleSelect = (movie: Movie): void => {
@@ -66,9 +70,9 @@ export default function App() {
     <div className={css.app}>
       <Toaster />
       <SearchBar onSubmit={handleSubmit} />
-      {data?.total_pages > 1 &&
+      {totalPages > 1 &&
         <ReactPaginate
-          pageCount={data.total_pages}
+          pageCount={totalPages}
           pageRangeDisplayed={5}
           marginPagesDisplayed={1}
           onPageChange={({ selected }) => setPage(selected + 1)}
@@ -78,7 +82,7 @@ export default function App() {
           nextLabel="→"
           previousLabel="←"
         />}
-      {data?.results.length > 0 && <MovieGrid onSelect={handleSelect} movies={data.results} />}
+      {movies.length > 0 && <MovieGrid onSelect={handleSelect} movies={movies} />}
       {isLoading && <Loader />}
       {isError && <ErrorMessage />}
       {isModalOpen && <MovieModal movie={clickedMovie} onClose={handleClose} />}
